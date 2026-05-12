@@ -1,0 +1,6 @@
+{
+  "name": "Remix: Ultrasound AI Dashboard",
+  "description": "Premium interface for the UltrasoundAI Pipeline to input patient ultrasound data and review AI recommendations.",
+  "requestFramePermissions": [],
+  "majorCapabilities": []
+}
