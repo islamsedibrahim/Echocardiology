@@ -10,7 +10,35 @@ async function startServer() {
   const app = express();
   const PORT = 3000;
 
-  app.use(express.json());
+  app.use(express.json({ limit: "50mb" }));
+
+  // ----------------------------------------------------
+  // CardioSolv digital-twin bridge (Isaac Sim extension <-> dashboard)
+  // ----------------------------------------------------
+  let latestEcho: any = null;
+  let latestTwin: any = null;
+
+  // Echo measurements of the last analysis; CardioSolv uses LVEF to personalise the twin.
+  app.post("/api/echo/latest", (req, res) => {
+    latestEcho = req.body;
+    res.json({ success: true });
+  });
+  app.get("/api/echo/latest", (_req, res) => {
+    const lvef = latestEcho?.measurements?.find((m: any) => String(m.name).startsWith("LVEF"))?.value ?? null;
+    res.json({ success: true, report: latestEcho, lvef });
+  });
+
+  // Digital-twin report posted by CardioSolv (cardiosolv_report.json).
+  app.post("/api/twin/report", (req, res) => {
+    if (!req.body || typeof req.body !== "object" || !req.body.cardiosolv_version) {
+      return res.status(400).json({ success: false, error: "Not a CardioSolv report." });
+    }
+    latestTwin = { ...req.body, received_at: new Date().toISOString() };
+    res.json({ success: true });
+  });
+  app.get("/api/twin/report", (_req, res) => {
+    res.json({ success: true, report: latestTwin });
+  });
 
   // API Route for Ultrasound pipeline
   app.post("/api/analyze", upload.single("media"), async (req, res) => {

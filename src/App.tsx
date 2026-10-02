@@ -8,6 +8,7 @@ import { motion, AnimatePresence } from 'motion/react';
 import { FileUp, Activity, Plus, File as FileIcon, ShieldAlert, CheckCircle, Info, Stethoscope, ChevronRight, Download, Eye, Loader2, BarChart2 } from 'lucide-react';
 import { ResponsiveContainer, BarChart, Bar, XAxis, YAxis, Tooltip, CartesianGrid, Cell, ReferenceLine } from 'recharts';
 import { cn } from './lib/utils';
+import DigitalTwinPanel from './components/DigitalTwinPanel';
 
 interface Finding {
   id: string;
@@ -41,6 +42,8 @@ export default function App() {
   const [fileName, setFileName] = useState<string | null>(null);
   const [isProcessing, setIsProcessing] = useState(false);
   const [report, setReport] = useState<Report | null>(null);
+  const [view, setView] = useState<'diagnostic' | 'twin'>('diagnostic');
+  const echoLvef = report?.measurements?.find((m) => m.name.startsWith('LVEF'))?.value ?? null;
   
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -91,6 +94,12 @@ export default function App() {
       const data = await res.json();
       if (data.success) {
         setReport(data.report);
+        // share the echo measurements with the digital twin (CardioSolv reads /api/echo/latest)
+        fetch("/api/echo/latest", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data.report),
+        }).catch(() => undefined);
       }
     } catch (err) {
       console.error(err);
@@ -124,7 +133,14 @@ export default function App() {
           className="flex items-center gap-6"
         >
           <div className="hidden md:flex gap-4 text-sm font-medium text-zinc-400">
-            <span className="text-white border-b-2 border-cyan-500 pb-1 cursor-pointer">Diagnostic Center</span>
+            <span
+              onClick={() => setView('diagnostic')}
+              className={cn("pb-1 cursor-pointer transition-colors", view === 'diagnostic' ? "text-white border-b-2 border-cyan-500" : "hover:text-zinc-200")}
+            >Diagnostic Center</span>
+            <span
+              onClick={() => setView('twin')}
+              className={cn("pb-1 cursor-pointer transition-colors", view === 'twin' ? "text-white border-b-2 border-rose-500" : "hover:text-zinc-200")}
+            >Digital Twin</span>
             <span className="cursor-pointer hover:text-zinc-200 transition-colors">Storage</span>
             <span className="cursor-pointer hover:text-zinc-200 transition-colors">History</span>
           </div>
@@ -137,6 +153,11 @@ export default function App() {
         </motion.div>
       </nav>
 
+      {view === 'twin' ? (
+        <main className="flex-1 max-w-[1400px] mx-auto w-full p-6 flex flex-col gap-6 relative z-10">
+          <DigitalTwinPanel echoLvef={echoLvef} />
+        </main>
+      ) : (
       <main className="flex-1 max-w-[1400px] mx-auto w-full p-6 flex flex-col lg:flex-row gap-6 relative z-10">
         
         {/* LEFT: Input Form */}
@@ -421,6 +442,7 @@ export default function App() {
             </AnimatePresence>
           </section>
       </main>
+      )}
 
       {/* Footer System Bar */}
       <footer className="h-8 shrink-0 bg-zinc-950 border-t border-white/5 px-6 flex items-center justify-between text-[10px] font-mono text-zinc-600 relative z-10 w-full mt-auto">
