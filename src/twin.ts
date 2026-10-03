@@ -13,6 +13,14 @@ export interface TwinMetrics {
   peak_aortic_pressure_mmhg: number;
   min_aortic_pressure_mmhg: number;
   peak_mean_fiber_strain: number;
+  // biventricular twins (CardioSolv >= 0.6)
+  rv_edv_ml?: number;
+  rv_esv_ml?: number;
+  rv_ejection_fraction_pct?: number;
+  peak_rv_pressure_mmhg?: number;
+  pa_systolic_mmhg?: number;
+  pa_diastolic_mmhg?: number;
+  rv_lv_edv_ratio?: number;
 }
 
 export interface TwinReport {

@@ -124,6 +124,14 @@ export default function DigitalTwinPanel({ echoLvef }: Props) {
             <Stat label="Aortic pressure" value={`${fmt(m?.peak_aortic_pressure_mmhg, 0)}/${fmt(m?.min_aortic_pressure_mmhg, 0)}`} unit="mmHg" />
             <Stat label="QRS duration" value={fmt(ep?.qrs_duration_ms, 0)} unit="ms" accent="text-amber-300" />
             <Stat label="Myocardial mass" value={fmt(geo?.myocardial_mass_g, 0)} unit="g" />
+            {m?.rv_ejection_fraction_pct !== undefined && (
+              <>
+                <Stat label="Twin RVEF" value={fmt(m.rv_ejection_fraction_pct)} unit="%" accent="text-rose-400" />
+                <Stat label="RVEDV / RVESV" value={`${fmt(m.rv_edv_ml, 0)} / ${fmt(m.rv_esv_ml, 0)}`} unit="mL" />
+                <Stat label="RV peak pressure" value={fmt(m.peak_rv_pressure_mmhg, 0)} unit="mmHg" />
+                <Stat label="PA pressure" value={`${fmt(m.pa_systolic_mmhg, 0)}/${fmt(m.pa_diastolic_mmhg, 0)}`} unit="mmHg" />
+              </>
+            )}
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
