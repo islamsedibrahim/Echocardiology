@@ -48,6 +48,14 @@ export interface TwinReport {
     calibration?: { target_ef_pct: number; contractility_scale: number; achieved_ef_pct: number } | null;
     pv_loop?: { t_ms: number[]; pressure_mmhg: number[]; volume_ml: number[] };
   };
+  scar?: { metrics: Record<string, number | object[]> & { channels?: { length_mm: number; transit_time_ms?: number }[] } };
+  crt_study?: {
+    lbbb: { qrs_duration_ms: number; lv_activation_time_ms: number };
+    best_site: { x_l: number; x_c: number; qrs_duration_ms: number; lv_activation_time_ms: number };
+    response: { predicted_response: string; lvat_reduction_pct: number; qrs_reduction_ms: number; reasons: string[] };
+    haemodynamics?: { dpdt_max_change_pct: number; ef_change_points: number };
+  };
+  diastolic_calibration?: { mode: string; stiff_scale: number; diastolic: Record<string, number | number[]> };
 }
 
 export interface ValidationGate {

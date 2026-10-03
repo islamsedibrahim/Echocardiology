@@ -132,6 +132,20 @@ export default function DigitalTwinPanel({ echoLvef }: Props) {
                 <Stat label="PA pressure" value={`${fmt(m.pa_systolic_mmhg, 0)}/${fmt(m.pa_diastolic_mmhg, 0)}`} unit="mmHg" />
               </>
             )}
+            {twin?.scar && (
+              <>
+                <Stat label="LV scar burden" value={fmt(twin.scar.metrics.lv_scar_burden_pct as number)} unit="%" accent="text-zinc-100" />
+                <Stat label="Scar core / BZ" value={`${fmt(twin.scar.metrics.core_volume_ml as number)} / ${fmt(twin.scar.metrics.border_zone_volume_ml as number)}`} unit="mL" />
+                <Stat label="Conduction channels" value={fmt(twin.scar.metrics.conduction_channels as number, 0)} unit="" accent="text-amber-300" />
+              </>
+            )}
+            {twin?.crt_study && (
+              <Stat label="CRT response (pred.)" value={twin.crt_study.response.predicted_response}
+                    unit={`LVAT -${fmt(twin.crt_study.response.lvat_reduction_pct, 0)} %`} accent="text-emerald-400" />
+            )}
+            {twin?.diastolic_calibration && (
+              <Stat label="ED chamber stiffness" value={fmt(twin.diastolic_calibration.diastolic.ed_chamber_stiffness_mmhg_per_ml as number, 2)} unit="mmHg/mL" />
+            )}
           </div>
 
           <div className="grid grid-cols-1 xl:grid-cols-2 gap-6">
